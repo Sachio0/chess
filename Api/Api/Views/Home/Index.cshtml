@@ -1,0 +1,70 @@
+﻿@*@{
+    ViewData["Title"] = "Home Page";
+}*@
+<head>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script src="~/chessboardjs-0.3.0/js/chessboard-0.3.0.js"></script>
+    <link href="~/chessboardjs-0.3.0/css/chessboard-0.3.0.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href='https://fonts.googleapis.com/css?family=Aguafina Script' rel='stylesheet'>
+</head>
+
+<body>
+<div style="height: 80%; width: 80%">
+    <ul id="menuStart" class="centered" >
+        <li><a  asp-area="" asp-controller="Home" asp-action="Game">Graj</a></li>
+        <li><a  asp-area="" asp-controller="Home" asp-action="Edit">Edytor gry</a></li>
+        <li><a  asp-area="" asp-controller="Home" asp-action="About">O aplikacji</a></li>
+    </ul>
+</div>
+
+</body>
+
+<style>
+
+    
+     .centered {
+         position: center;
+         top: 50%;
+         left: 50%;
+         margin-top: -50px;
+         margin-left: -100px;
+     }
+    .buttonDown {
+        background-color: #f0d9b5;
+        border: none;
+        color: black;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .buttonDown:hover {
+        background-color: #e0c9a5;
+    }
+    .Title {
+        border-color: black;
+        border-bottom-width: medium;
+        text-align: center;
+        font-style: italic;
+        width: 100%;
+        background-color: #f0d9b5;
+        font-size: 500%;
+        color: black;
+        margin: auto;
+        position: center;
+    }
+
+    #menuStart {
+        color: black;
+        margin-top: 200%;
+        line-height: 300%;
+        margin: auto;
+        width: 100%;
+        text-align: center;
+        font: italic;
+        font-family: 'Aguafina Script';
+        font-size: 5vw;
+        list-style-type: none;
+    }
+</style>

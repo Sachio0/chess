@@ -1,0 +1,111 @@
+﻿@model object
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+<head>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script src="~/chessboardjs-0.3.0/js/chessboard-0.3.0.js"></script>
+    <link href="~/chessboardjs-0.3.0/css/chessboard-0.3.0.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    
+</head>
+
+<body>
+
+    <header Class="Title">
+        Ustawianie Sytuacji
+    </header>
+        <div id="board2" style="width: 60%; border: black; border-bottom-width: 10px; margin: auto"></div>
+    
+
+    <input type="button" id="startBtn" value="Start" Class="buttonDown" />
+    <input type="button" id="clearBtn" value="Czyść" Class="buttonDown" />
+    <input type="button" id="toFile" value="Do pliku" Class="buttonDown" />
+    <input type="button" id="play" value="Graj" Class="buttonDown"/>
+</body>
+
+<script>
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+    function clickGetPositionBtn() {
+        download("chess.txt", board2.fen());
+        console.log(board2.position());
+
+        console.log("Current position as a FEN string:");
+        console.log(board2.fen());
+    }
+    var board2 = ChessBoard('board2', {
+        draggable: true,
+        dropOffBoard: 'trash',
+        sparePieces: true
+    });
+
+    function SendPossiton() {
+        var board = {
+            Possiotion: board2.fen(),
+            Status: false
+        };
+        
+        $.ajax({
+            type: "POST",
+            traditional: true,
+            async: false,
+            cache: false,
+            url: '/Home/GetData',
+            context: document.body,
+            data: board,
+            success: function (result) {
+                window.location.href = "Game";
+            },
+            error: function (xhr) { 
+                console.log(xhr.responseText);
+                alert("Error");
+            }
+        });
+        
+    }
+    
+    $('#startBtn').on('click', board2.start);
+    $('#clearBtn').on('click', board2.clear);
+    $('#toFile').on('click', clickGetPositionBtn);
+    $('#play').on('click', SendPossiton);
+    $(window).resize(board2.resize);
+
+</script>
+<style>
+    .buttonDown {
+        background-color: #f0d9b5;
+        border: none;
+        color: black;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .buttonDown:hover {
+            background-color: #e0c9a5;
+        }
+
+    .Title {
+        text-align: center;
+        font-style: italic;
+        width: 100%;
+        font-size: 500%;
+        color: black;
+        margin: auto;
+        position: center;
+    }
+</style>
