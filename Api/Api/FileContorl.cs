@@ -11,43 +11,53 @@ namespace Api
 {
     public class FileContorl
     {
-        TextWriter xmlWriter;
-        XmlSerializer ser;
-        MovingXml xml;
-
-        public MovingXml Xml { get => xml; set => xml = value; }
-
-        FileContorl(string filename)
-        {
-            xmlWriter = new StreamWriter(filename);
-            ser = new XmlSerializer(typeof(MovingXml));
-        }
+        List<MovingXml> _xml;
+        string _fileName;
+        ChoseTree _tree;
         
+
+        public FileContorl(string filename)
+        {
+
+            _fileName = filename;
+            _tree = new ChoseTree();
+            _xml = read();
+        }
+
+        public void AddMoveToTree(MovingXml xml)
+        {
+            _xml.Add(xml);
+        }
+        public void update(List<MovingXml> tree)
+        {
+            _xml = tree;
+            save();
+        }
+
         public void save()
         {
-            ser.Serialize(xmlWriter, xml);
+            _tree.moves = _xml.ToArray();
+            using (var xmlWriter = new StreamWriter(_fileName +".xml"))
+            {
+                new XmlSerializer(typeof(ChoseTree)).Serialize(xmlWriter, _tree);
+            }
         }
-        //XmlReader xmlReader;
-        //public void CreateNewFile(string fileName)
-        //{
-        //    xmlWriter = XmlWriter.Create(fileName);
+        
+        public List<MovingXml> read()
+        {
+            if (!File.Exists(_fileName + ".xml"))
+            {
 
-        //}
-        //public void addMove(string possiton, Dictionary<string,int> capabilities)
-        //{
-        //    xmlWriter.WriteStartElement("stage");
-        //    xmlWriter.WriteStartElement("possiton");
-        //    xmlWriter.WriteString(possiton);
-        //    foreach (var item in capabilities)
-        //    {
-        //        xmlWriter.WriteStartElement("Capabilitie");
-        //        xmlWriter.WriteStartElement("move");
-        //        xmlWriter.WriteString(item.Key);
-        //        xmlWriter.WriteStartElement("chanse");
-        //        xmlWriter.WriteValue(item.Value);
-        //    }
-
-        //}
+                return new List<MovingXml>();
+            }
+            using (Stream reader = new FileStream(_fileName + ".xml", FileMode.Open))
+            {
+                var serializer = new XmlSerializer(typeof(ChoseTree));
+                _tree = (ChoseTree)serializer.Deserialize(reader);
+            }
+            return _tree.moves.ToList();
+        }
+        
 
     }
 }

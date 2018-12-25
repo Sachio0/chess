@@ -87,20 +87,14 @@
             Status: false,
             possibleMoves: game.moves()
         };
-        //var data = { username: 'example' };
-        var res;
         fetch('/home/Ia', {
             method: 'POST', 
-            body: JSON.stringify(board2), 
+            body: JSON.stringify(board2),
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json())
             .then(response => makemovefrom(JSON.stringify(response)))
-            //.then(response => function () {
-            //    game.move(JSON.stringify(response));
-            //    board.position(game.fen());
-            //})
             .catch(error => console.error('Error:', error));
 
     }

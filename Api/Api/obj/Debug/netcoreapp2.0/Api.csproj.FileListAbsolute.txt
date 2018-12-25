@@ -40,3 +40,14 @@ E:\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfoInputs.cache
 E:\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfo.cs
 E:\Api\Api\obj\Debug\netcoreapp2.0\Api.dll
 E:\Api\Api\obj\Debug\netcoreapp2.0\Api.pdb
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.csprojAssemblyReference.cache
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.csproj.CoreCompileInputs.cache
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfoInputs.cache
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfo.cs
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.dll
+F:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.pdb
+F:\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.deps.json
+F:\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.runtimeconfig.json
+F:\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.runtimeconfig.dev.json
+F:\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.dll
+F:\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.pdb

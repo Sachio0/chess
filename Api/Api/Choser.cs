@@ -1,18 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Api.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api
 {
-    public class Choser : IChoser
+    public class Choser //: IChoser
     {
         public Choser(HttpContext context)
         {
              this.session = context.Session;
             updateSession();
         }
+        private string _fileName;
         private ISession session;
         private Dictionary<char, int?> figuresCount = new Dictionary<char, int?>()
             {
@@ -32,6 +35,7 @@ namespace Api
             {'k', 100}
         };
         private string last = String.Empty;
+        private string lastChoese = String.Empty;
         //private List<string> lasts = new List<string>();
         //Description
         //P - pionek
@@ -43,28 +47,28 @@ namespace Api
         //w - ruch białych
         //b - ruch czarnych
         //roszady KQ -białe kq - czarne
-        //
-        //
-        public string makeRandomeMove(ChoseTree tree)
+
+        public string makeRandomeMove(Board tree)
         {
             Random r = new Random();
-            chengeCountFigures(tree.Position);
+            chengeCountFigures(tree.Possiotion);
             if (!String.IsNullOrEmpty(last))
             {
                 var figure = checkFigureCount(last);
                 if (figure != ' ')
                 {
-                    takeChanse(figure);
+                    upDateChanse(figure);
                 }
             }
-            
-            var res = r.Next(tree.Capabilities.Length);
-            last = tree.Position;
+            addToFile(tree.possiblemoves, tree.Possiotion);
+            var res = r.Next(tree.possiblemoves.Length);
+            last = tree.Possiotion;
+            lastChoese = tree.possiblemoves[res];
             addToSession();
-            return tree.Capabilities[res];
+            return lastChoese;
         }
 
-        public void takeChanse(char figure)
+        public void takeChanse(char figure, string[] capabilities)
         {
             if (figure == 'p') { }
             if (figure == 'n') { }
@@ -72,12 +76,23 @@ namespace Api
             if (figure == 'r') { }
             if (figure == 'q') { }
         }
+        public void CreateChanseToMove(string[] capabilities)
+        {
+            Dictionary<int, string> MoveChanse = new Dictionary<int, string>();
+            foreach (var item in capabilities)
+            {
 
+            }
+        }
         public void useChanse()
         {
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="positon"></param>
+        /// <returns></returns>
         private char checkFigureCount(string positon)
         {
             positon = preperPosition(positon);
@@ -111,18 +126,51 @@ namespace Api
                 SessionExtensions.SetInt32(session, item.Key.ToString(), item.Value??0);
             }
             SessionExtensions.SetString(session, "last", last);
-            
+            SessionExtensions.SetString(session, "lastChose", lastChoese);
         }
 
         private void updateSession()
         {
+
             last = SessionExtensions.GetString(session, "last");
-            if(!String.IsNullOrEmpty(last))
+            lastChoese = SessionExtensions.GetString(session, "lastChose");
+            if (!String.IsNullOrEmpty(last))
                 foreach (var item in figuresCount.Select(n=>n.Key).ToArray())
                 {
                     figuresCount[item] = SessionExtensions.GetInt32(session, item.ToString());
                 }
-            
+        }
+        private void upDateChanse(char figure)
+        {
+            FileContorl file = new FileContorl("Game");
+            var FullMoves = file.read();
+            var lastObject = FullMoves.Last().Chanse;
+            var keyToUpChanse = lastObject.Where(n => n.Key == lastChoese).FirstOrDefault().Key;
+
+            lastObject[keyToUpChanse] = lastObject[keyToUpChanse] + figuresValue[figure];
+            FullMoves[FullMoves.Count - 1].Chanse = lastObject;
+            file.update(FullMoves);
+        }
+        private void addToFile(string[] capabilities, string positon)
+        {
+            Dictionary<string, int> chanse = new Dictionary<string, int>();
+            foreach (var item in capabilities)
+            {
+                chanse.Add(item, 1);
+            }
+            saveAdd(chanse, positon);
+        }
+
+        private void saveAdd(Dictionary<string,int> chanse, string positon)
+        {
+            FileContorl file = new FileContorl("Game");
+            file.AddMoveToTree(new MovingXml() { Chanse = chanse, possiton = positon });
+            file.save();
+        }
+        public static void DeleteFile()
+        {
+            if (File.Exists("Game.xml"))
+                File.Delete("Game.xml");
         }
     }
 }

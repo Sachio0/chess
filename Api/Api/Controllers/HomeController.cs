@@ -49,11 +49,11 @@ namespace Api.Controllers
         }
         public IActionResult Game(Board b)
         {
+
+            HttpContext.Session.Clear();
+            Choser.DeleteFile();
             ViewData["pos"] = HttpContext.Request.Cookies["pos"];
-
             return View();
-
-
         }
 
         public IActionResult Edit()
@@ -84,13 +84,9 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Ia([FromBody] Board board)
         {
-            
-            ChoseTree tree = new ChoseTree();
-            tree.Capabilities = board.possiblemoves;
-            tree.Position = board.Possiotion;
             Choser choser = new Choser(Response.HttpContext);
             
-            return Json(choser.makeRandomeMove(tree));
+            return Json(choser.makeRandomeMove(board));
         }
     }
 }

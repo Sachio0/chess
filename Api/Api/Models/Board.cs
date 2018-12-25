@@ -9,7 +9,7 @@ namespace Api.Models
     public class Board
     {
         [XmlAttribute]
-        public String Possiotion { get; set; }
+        public string Possiotion { get; set; }
         [XmlAttribute]
         public string[] possiblemoves { get; set; }
     }
