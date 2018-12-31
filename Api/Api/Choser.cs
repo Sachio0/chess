@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Extensions;
+using Api.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,20 @@ namespace Api
 {
     public class Choser //: IChoser
     {
-        public Choser(HttpContext context)
+        public Choser(HttpContext context, string fileName)
         {
              this.session = context.Session;
             updateSession();
+            _fileName = fileName;
+            fillFullMoves();
         }
+
+        private void fillFullMoves()
+        {
+            FileContorl file = new FileContorl(_fileName);
+            fullMoves = file.read();
+        }
+
         private string _fileName;
         private ISession session;
         private Dictionary<char, int?> figuresCount = new Dictionary<char, int?>()
@@ -36,6 +46,8 @@ namespace Api
         };
         private string last = String.Empty;
         private string lastChoese = String.Empty;
+        private List<MovingXml> fullMoves;
+
         //private List<string> lasts = new List<string>();
         //Description
         //P - pionek
@@ -50,6 +62,7 @@ namespace Api
 
         public string makeRandomeMove(Board tree)
         {
+            string res;
             Random r = new Random();
             chengeCountFigures(tree.Possiotion);
             if (!String.IsNullOrEmpty(last))
@@ -60,10 +73,17 @@ namespace Api
                     upDateChanse(figure);
                 }
             }
-            addToFile(tree.possiblemoves, tree.Possiotion);
-            var res = r.Next(tree.possiblemoves.Length);
+            if (!fullMoves.Select(n => n.possiton).Contains(tree.Possiotion))
+            {
+                addToFile(tree.possiblemoves, tree.Possiotion);
+                res = tree.possiblemoves[r.Next(tree.possiblemoves.Length)];
+
+            }
+            else
+                res = useChanse(tree.Possiotion);
+
             last = tree.Possiotion;
-            lastChoese = tree.possiblemoves[res];
+            lastChoese = res;
             addToSession();
             return lastChoese;
         }
@@ -84,9 +104,9 @@ namespace Api
 
             }
         }
-        public void useChanse()
+        public string useChanse(string pos)
         {
-
+            return fullMoves.First(n => n.possiton == pos).Chanse.ProbablityRandom();
         }
         /// <summary>
         /// 
@@ -142,14 +162,24 @@ namespace Api
         }
         private void upDateChanse(char figure)
         {
-            FileContorl file = new FileContorl("Game");
-            var FullMoves = file.read();
-            var lastObject = FullMoves.Last().Chanse;
-            var keyToUpChanse = lastObject.Where(n => n.Key == lastChoese).FirstOrDefault().Key;
-
-            lastObject[keyToUpChanse] = lastObject[keyToUpChanse] + figuresValue[figure];
-            FullMoves[FullMoves.Count - 1].Chanse = lastObject;
-            file.update(FullMoves);
+            
+            var index = fullMoves.IndexOf(fullMoves.FirstOrDefault(n => n.possiton == last));
+            var currentObject = fullMoves.FirstOrDefault(n => n.possiton == last);
+            var dictCurrentObj = currentObject.Chanse;
+            dictCurrentObj[lastChoese] = currentObject.Chanse[lastChoese] + figuresValue[figure];
+            currentObject.Chanse = dictCurrentObj;
+            fullMoves[index] = currentObject;
+            //var lastObject = fullMoves.Last().Chanse;
+            //var keyToUpChanse = lastObject.Where(n => n.Key == lastChoese).FirstOrDefault().Key;
+            //lastObject[keyToUpChanse] = lastObject[keyToUpChanse] + figuresValue[figure];
+            //fullMoves[fullMoves.Count - 1].Chanse = lastObject;
+            FileContorl file = new FileContorl(_fileName);
+            file.update(fullMoves);
+        }
+        private void reaFile()
+        {
+            FileContorl file = new FileContorl(_fileName);
+            fullMoves = file.read();
         }
         private void addToFile(string[] capabilities, string positon)
         {
@@ -163,14 +193,14 @@ namespace Api
 
         private void saveAdd(Dictionary<string,int> chanse, string positon)
         {
-            FileContorl file = new FileContorl("Game");
+            FileContorl file = new FileContorl(_fileName);
             file.AddMoveToTree(new MovingXml() { Chanse = chanse, possiton = positon });
             file.save();
         }
-        public static void DeleteFile()
+        public static void DeleteFile(string fileName)
         {
-            if (File.Exists("Game.xml"))
-                File.Delete("Game.xml");
+            if (File.Exists(fileName))
+                File.Delete(fileName);
         }
     }
 }

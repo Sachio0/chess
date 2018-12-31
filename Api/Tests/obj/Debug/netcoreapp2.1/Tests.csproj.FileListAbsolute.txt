@@ -1,0 +1,17 @@
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Tests.deps.json
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Tests.runtimeconfig.json
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Tests.runtimeconfig.dev.json
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Tests.dll
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Tests.pdb
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Api.dll
+F:\chess\Api\Tests\bin\Debug\netcoreapp2.1\Api.pdb
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.csprojAssemblyReference.cache
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.csproj.CoreCompileInputs.cache
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.AssemblyInfoInputs.cache
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.AssemblyInfo.cs
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.csproj.CopyComplete
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.dll
+F:\chess\Api\Tests\obj\Debug\netcoreapp2.1\Tests.pdb

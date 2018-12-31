@@ -16,7 +16,10 @@ namespace Api.Models
         [XmlArray]
         public int[] chanses;
         [XmlIgnore]
-        public Dictionary<string, int> Chanse { get => parseTwoArrayToDictionarty(); set => parseDictionaryToTwoArray(value); }
+        public Dictionary<string, int> Chanse {
+            get => parseTwoArrayToDictionarty();
+            set => parseDictionaryToTwoArray(value);
+        }
         
 
         private void parseDictionaryToTwoArray(Dictionary<string, int> chanse)

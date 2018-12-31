@@ -37,7 +37,7 @@ namespace Api
         public void save()
         {
             _tree.moves = _xml.ToArray();
-            using (var xmlWriter = new StreamWriter(_fileName +".xml"))
+            using (var xmlWriter = new StreamWriter(_fileName))
             {
                 new XmlSerializer(typeof(ChoseTree)).Serialize(xmlWriter, _tree);
             }
@@ -45,12 +45,12 @@ namespace Api
         
         public List<MovingXml> read()
         {
-            if (!File.Exists(_fileName + ".xml"))
+            if (!File.Exists(_fileName))
             {
 
                 return new List<MovingXml>();
             }
-            using (Stream reader = new FileStream(_fileName + ".xml", FileMode.Open))
+            using (Stream reader = new FileStream(_fileName, FileMode.Open))
             {
                 var serializer = new XmlSerializer(typeof(ChoseTree));
                 _tree = (ChoseTree)serializer.Deserialize(reader);

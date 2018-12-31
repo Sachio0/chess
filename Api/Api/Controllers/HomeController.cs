@@ -51,7 +51,7 @@ namespace Api.Controllers
         {
 
             HttpContext.Session.Clear();
-            Choser.DeleteFile();
+            //Choser.DeleteFile();
             ViewData["pos"] = HttpContext.Request.Cookies["pos"];
             return View();
         }
@@ -84,7 +84,8 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Ia([FromBody] Board board)
         {
-            Choser choser = new Choser(Response.HttpContext);
+
+            Choser choser = new Choser(Response.HttpContext, "Game.xml");
             
             return Json(choser.makeRandomeMove(board));
         }
