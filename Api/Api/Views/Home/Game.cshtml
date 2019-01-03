@@ -17,13 +17,13 @@
 <input type="file" id="fromFile" accept=".txt" value="Wczytaj" Class="buttonDown" />
 <input type="button" id="toFile" value="Do pliku" Class="buttonDown" />
 <input type="button" id="startBtn" value="Reset" Class="buttonDown" />
-<label class="buttonDown">Kontra PC Losowe ruchy
-    <input type="checkbox" id="PC"/>
-    
-</label>
 <label class="buttonDown">
     Kontra PC IA
-    <input type="checkbox" id="IA" />
+    <input type="checkbox" id="IA" checked="checked"/>
+</label>
+<label class="buttonDown">
+    Ucz się
+    <input type="checkbox" id="lern" checked="checked"/>
 </label>
 
 <script>
@@ -33,7 +33,7 @@
         statusEl = $('#status'),
         fenEl = $('#fen'),
         pgnEl = $('#pgn');
-    var onDragStart = function (source, piece) {
+    var onDragStart = function ( piece) {
         if (game.game_over() === true ||
             (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
             (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -73,16 +73,17 @@
         document.body.removeChild(element);
     }
     var makeInter = function () {
-        if ($('#PC').prop("checked"))
-            window.setInterval(makeRandomMove, 250);
-        else if ($('#IA').prop("checked"))
-            window.setInterval(makePCMove, 250);
+        if ($('#IA').prop("checked")) window.setInterval(makePCMove, 250);
     }
     var makePCMove = function () {
         var possibleMoves = game.moves();
-        if (possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
-            return;
+        if ($('#lern').prop("checked"))
+            if (possibleMoves.length === 0 /*|| game.turn() === 'w'*/ || !$('#IA').prop("checked"))
+                return;
+        else if(possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
+        return;
         var board2 = {
+            Turn: game.turn(),
             Possiotion: game.fen(),
             Status: false,
             possibleMoves: game.moves()
@@ -108,7 +109,7 @@
         // game over
         if (possibleMoves.length === 0 || game.turn() === 'w' || !$('#PC').prop("checked"))
             return;
-
+        
         var randomIndex = Math.floor(Math.random() * possibleMoves.length);
         game.move(possibleMoves[randomIndex]);
         board.position(game.fen());
@@ -134,7 +135,7 @@
 
     var updateStatus = function () {
         var status = '';
-
+        
         var moveColor = 'White';
         if (game.turn() === 'b') {
             moveColor = 'Black';
@@ -187,8 +188,8 @@
         });
     $('#fromFile').on('change', clickSetPositionBtn);
     $('#toFile').on('click', clickGetPositionBtn);
-    $('#PC').on('change', makeInter);
     $('#IA').on('change', makeInter);
+    $(document).ready(makeInter);
     
 </script>
 <style>

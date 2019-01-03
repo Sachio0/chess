@@ -84,9 +84,7 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Ia([FromBody] Board board)
         {
-
             Choser choser = new Choser(Response.HttpContext, "Game.xml");
-            
             return Json(choser.makeRandomeMove(board));
         }
     }
