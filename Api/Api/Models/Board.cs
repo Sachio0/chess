@@ -9,6 +9,8 @@ namespace Api.Models
     public class Board
     {
         [XmlAttribute]
+        public char turn { get; set; } //w or b
+        [XmlAttribute]
         public string Possiotion { get; set; }
         [XmlAttribute]
         public string[] possiblemoves { get; set; }

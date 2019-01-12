@@ -14,20 +14,33 @@
     Gra
 </header>
 <div id="board" style="width: 60%; border: black; border-bottom-width: 10px; margin: auto; padding-top: 5%"></div>
-<input type="file" id="fromFile" accept=".txt" value="Wczytaj" Class="buttonDown" />
 <input type="button" id="toFile" value="Do pliku" Class="buttonDown" />
 <input type="button" id="startBtn" value="Reset" Class="buttonDown" />
 <label class="buttonDown">
     Kontra PC IA
-    <input type="checkbox" id="IA" checked="checked"/>
+    <input type="checkbox" id="IA" checked="checked" />
 </label>
 <label class="buttonDown">
     Ucz się
-    <input type="checkbox" id="lern" checked="checked"/>
+    <input type="checkbox" id="lern" checked="checked" />
 </label>
-
+<input type="button" id="toFileIA" value="Pobierz IA" Class="buttonDown" />
+@*<form asp-controller="Home" asp-action="UploadFile" method="post" class="buttonDown"
+      enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Upload File</button>
+</form>*@
+<br />
+<label Class="buttonDown">
+    Wczytaj ustawienie na planszy
+    <input type="file" id="fromFile" accept=".txt" value="Wczytaj"  />
+</label>
+<label Class="buttonDown">
+    Wczytaj Bota
+    <input type="file" id="IAFile" accept=".xml" value="Wczytaj"  />
+</label>
 <script>
-    
+
     var board,
         game = new Chess(),
         statusEl = $('#status'),
@@ -46,19 +59,22 @@
         if (fileToLoad) {
             var reader = new FileReader();
             reader.onload = function (fileLoadedEvent) {
-                textFromFileLoaded = fileLoadedEvent.target.result;                
+                textFromFileLoaded = fileLoadedEvent.target.result;
                 var fenn = textFromFileLoaded;
                 game.load(fenn + " w - - 1 45");
                 board.position(fenn);
             };
             reader.readAsText(fileToLoad, 'UTF-8');
         }
-        
+
     }
     function clickGetPositionBtn() {
         var fen = game.fen().split(' ');
         download("chess.txt", fen[0]);
         console.log(fen[0]);
+    }
+    function dowloadIA() {
+
     }
     function download(filename, text) {
         var element = document.createElement('a');
@@ -73,13 +89,14 @@
         document.body.removeChild(element);
     }
     var makeInter = function () {
-        if ($('#IA').prop("checked")) window.setInterval(makePCMove, 250);
+        if ($('#IA').prop("checked")) window.setInterval(makePCMove, 200);
     }
     var makePCMove = function () {
+        updateStatus();
         var possibleMoves = game.moves();
-        if ($('#lern').prop("checked"))
-            if (possibleMoves.length === 0 /*|| game.turn() === 'w'*/ || !$('#IA').prop("checked"))
-                return;
+        if ($('#lern').prop("checked")) {
+            if (possibleMoves.length === 0 || !$('#IA').prop("checked")) return;
+        }
         else if(possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
         return;
         var board2 = {
@@ -89,7 +106,7 @@
             possibleMoves: game.moves()
         };
         fetch('/home/Ia', {
-            method: 'POST', 
+            method: 'POST',
             body: JSON.stringify(board2),
             headers: {
                 'Content-Type': 'application/json'
@@ -109,11 +126,21 @@
         // game over
         if (possibleMoves.length === 0 || game.turn() === 'w' || !$('#PC').prop("checked"))
             return;
-        
+
         var randomIndex = Math.floor(Math.random() * possibleMoves.length);
         game.move(possibleMoves[randomIndex]);
         board.position(game.fen());
     };
+    function downloadIA() {
+        let url = `/home/DownloadIA`;
+        return fetch(url, {
+            method: 'GET',
+        }).then(function (resp) {
+            return resp.blob
+        }).then(function (blob) {
+            download(blob);
+        });
+    }
     
 
     var onDrop = function (source, target) {
@@ -135,7 +162,7 @@
 
     var updateStatus = function () {
         var status = '';
-        
+
         var moveColor = 'White';
         if (game.turn() === 'b') {
             moveColor = 'Black';
@@ -143,10 +170,14 @@
 
         if (game.in_checkmate() === true) {
             status = 'Game over, ' + moveColor + ' is in checkmate.';
+            if ($('#lern').prop("checked")) location.reload();
+            alert(status);
         }
 
         else if (game.in_draw() === true) {
             status = 'Game over, drawn position';
+            if ($('#lern').prop("checked")) location.reload();
+            alert(status);
         }
 
         else {
@@ -171,7 +202,7 @@
     board = ChessBoard('board', cfg);
 
     var pos = "@ViewData["pos"]";
-    
+
 
 
     if (pos != String.null || pos != "") {
@@ -188,25 +219,27 @@
         });
     $('#fromFile').on('change', clickSetPositionBtn);
     $('#toFile').on('click', clickGetPositionBtn);
+    $('#toFileIA').on('click', downloadIA);
     $('#IA').on('change', makeInter);
     $(document).ready(makeInter);
-    
+
 </script>
 <style>
-       
-     .buttonDown {
-         background-color: #f0d9b5;
-         border: none;
-         color: black;
-         padding: 15px 32px;
-         text-align: center;
-         text-decoration: none;
-         display: inline-block;
-     }
 
-    .buttonDown:hover {
-        background-color: #e0c9a5;
+    .buttonDown {
+        background-color: #f0d9b5;
+        border: none;
+        color: black;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
     }
+
+        .buttonDown:hover {
+            background-color: #e0c9a5;
+        }
+
     .Title {
         text-align: center;
         font-style: italic;

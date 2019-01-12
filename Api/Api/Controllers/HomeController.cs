@@ -12,6 +12,7 @@ using System.Web;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Api.Controllers
 {
@@ -49,7 +50,6 @@ namespace Api.Controllers
         }
         public IActionResult Game(Board b)
         {
-
             HttpContext.Session.Clear();
             //Choser.DeleteFile();
             ViewData["pos"] = HttpContext.Request.Cookies["pos"];
@@ -58,7 +58,6 @@ namespace Api.Controllers
 
         public IActionResult Edit()
         {
-
             return View();
         }
         [HttpPost]
@@ -84,8 +83,53 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Ia([FromBody] Board board)
         {
-            Choser choser = new Choser(Response.HttpContext, "Game.xml");
+            Choser choser;
+            if (board.turn == 'w') choser = new Choser(Response.HttpContext, "Game2.xml", board.turn);
+            else choser = new Choser(Response.HttpContext, "Game1.xml", board.turn);
             return Json(choser.makeRandomeMove(board));
         }
+        public async Task<IActionResult> DownloadIA()
+        {
+            var memory = new MemoryStream();
+            using (var stream = new FileStream("game.xml", FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            return File(memory, Path.GetFileName(@"F:\chess\Api\Api\Game.xml"));
+        }
+        //public async Task<IActionResult> Download(string filename)
+        //{
+        //    if (filename == null)
+        //        return Content("filename not present");
+
+        //    var path = Path.Combine(
+        //                   Directory.GetCurrentDirectory(),
+        //                   "wwwroot", filename);
+
+        //    var memory = new MemoryStream();
+        //    using (var stream = new FileStream(path, FileMode.Open))
+        //    {
+        //        await stream.CopyToAsync(memory);
+        //    }
+        //    memory.Position = 0;
+        //    return File(memory, GetContentType(path), Path.GetFileName(path));
+        //}
+
+        //public async Task<IActionResult> UploadFile()
+        //{
+        //    if (file == null || file.Length == 0)
+        //        return Content("file not selected");
+
+        //    var path = Path.Combine(
+        //                Directory.GetCurrentDirectory(), "wwwroot",
+        //                file.FileName);
+
+        //    using (var stream = new FileStream(path, FileMode.Create))
+        //    {
+        //        await file.CopyToAsync(stream);
+        //    }
+
+        //    return RedirectToAction("Files");
+        //}
     }
 }

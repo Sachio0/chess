@@ -15,6 +15,8 @@ namespace Api.Models
         public string[] positions;
         [XmlArray]
         public int[] chanses;
+        [XmlElement]
+        public MovingXml[] options; 
         [XmlIgnore]
         public Dictionary<string, int> Chanse {
             get => parseTwoArrayToDictionarty();

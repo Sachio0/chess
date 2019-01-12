@@ -11,10 +11,10 @@ namespace Api
 {
     public class Choser //: IChoser
     {
-        public Choser(HttpContext context, string fileName)
+        public Choser(HttpContext context, string fileName, char turn)
         {
              this.session = context.Session;
-            updateSession();
+            updateSession(turn);
             _fileName = fileName;
             fillFullMoves();
         }
@@ -84,7 +84,7 @@ namespace Api
 
             last = tree.Possiotion;
             lastChoese = res;
-            addToSession();
+            addToSession(tree.turn);
             return lastChoese;
         }
 
@@ -139,21 +139,21 @@ namespace Api
             figuresCount['q'] = positon.Count(n => n == 'q');
         }
 
-        private void addToSession()
+        private void addToSession(char turn)
         {
             foreach (var item in figuresCount)
             {
                 SessionExtensions.SetInt32(session, item.Key.ToString(), item.Value??0);
             }
-            SessionExtensions.SetString(session, "last", last);
-            SessionExtensions.SetString(session, "lastChose", lastChoese);
+            SessionExtensions.SetString(session, "last" + turn, last);
+            SessionExtensions.SetString(session, "lastChose" + turn, lastChoese);
         }
 
-        private void updateSession()
+        private void updateSession(char turn)
         {
-
-            last = SessionExtensions.GetString(session, "last");
-            lastChoese = SessionExtensions.GetString(session, "lastChose");
+            
+            last = SessionExtensions.GetString(session, "last" + turn);
+            lastChoese = SessionExtensions.GetString(session, "lastChose" + turn);
             if (!String.IsNullOrEmpty(last))
                 foreach (var item in figuresCount.Select(n=>n.Key).ToArray())
                 {
@@ -169,13 +169,19 @@ namespace Api
             dictCurrentObj[lastChoese] = currentObject.Chanse[lastChoese] + figuresValue[figure];
             currentObject.Chanse = dictCurrentObj;
             fullMoves[index] = currentObject;
-            //var lastObject = fullMoves.Last().Chanse;
-            //var keyToUpChanse = lastObject.Where(n => n.Key == lastChoese).FirstOrDefault().Key;
-            //lastObject[keyToUpChanse] = lastObject[keyToUpChanse] + figuresValue[figure];
-            //fullMoves[fullMoves.Count - 1].Chanse = lastObject;
             FileContorl file = new FileContorl(_fileName);
             file.update(fullMoves);
         }
+        #region alt
+        private void upDateXml(char Figure)
+        {
+
+        }
+        private void addMove(char Figure)
+        {
+
+        }
+        #endregion
         private void reaFile()
         {
             FileContorl file = new FileContorl(_fileName);
