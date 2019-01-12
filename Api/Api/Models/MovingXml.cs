@@ -12,11 +12,16 @@ namespace Api.Models
         [XmlAttribute("Pos")]
         public string possiton;
         [XmlArray]
-        public string[] positions;
+        public string[] moves;
         [XmlArray]
         public int[] chanses;
-        [XmlElement]
-        public MovingXml[] options; 
+        [XmlArray]
+        public List<PrevChoes> PrevPossiton;
+        [XmlArray]
+        public List<string> NextPossiton;
+
+        //[XmlElement]
+        //public MovingXml[] options; 
         [XmlIgnore]
         public Dictionary<string, int> Chanse {
             get => parseTwoArrayToDictionarty();
@@ -26,12 +31,12 @@ namespace Api.Models
 
         private void parseDictionaryToTwoArray(Dictionary<string, int> chanse)
         {
-            positions = new string[chanse.Count];
+            moves = new string[chanse.Count];
             chanses = new int[chanse.Count];
             int counter = 0;
             foreach (var item in chanse)
             {
-                positions[counter] = item.Key;
+                moves[counter] = item.Key;
                 chanses[counter] = item.Value;
                 counter++;
             }
@@ -39,9 +44,9 @@ namespace Api.Models
         private Dictionary<string, int> parseTwoArrayToDictionarty()
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
-            for (int i = 0; i < positions.Length; i++)
+            for (int i = 0; i < moves.Length; i++)
             {
-                result.Add(positions[i], chanses[i]);
+                result.Add(moves[i], chanses[i]);
             }
             return result;
         }

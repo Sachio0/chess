@@ -12,7 +12,7 @@ namespace Tests
         {
             MovingXml xml = new MovingXml();
             xml.Chanse = generateValues();
-            Assert.NotEmpty(xml.positions);
+            Assert.NotEmpty(xml.moves);
             Assert.NotEmpty(xml.chanses);
             var dic = xml.Chanse;
             dic["10"] = 21;
