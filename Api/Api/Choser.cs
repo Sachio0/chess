@@ -111,22 +111,37 @@ namespace Api
 
             }
         }
-        
-        private string useChanse(string pos,int counter)
+        private string useChaseAlt(string pos,int counter = 2)
+        {
+            //Dictionary<string, MovingXml> nextMoves = new Dictionary<string, MovingXml>();
+            var acualyMove = fullMoves.First(n => n.possiton == pos);
+            var nextMoves = fullMoves.Where(n => n.PrevPossiton.Select(m => m.Position).Contains(pos))
+                .ToDictionary(n => n, m => m.PrevPossiton.First(x => x.Position.Contains(pos)));
+            if (counter == 1) return shareForOneAlt(nextMoves);
+        }
+
+        private string shareForOneAlt(Dictionary<MovingXml, PrevChoes> nextMoves)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string useChanse(string pos, int counter = 2)
         {
             string res = String.Empty;
             List<MovingXml> nextMoves;
+            
             List<List<MovingXml>> nextNextMoves = new List<List<MovingXml>>();
             List<List<List<MovingXml>>> nextNextNextMoves = new List<List<List<MovingXml>>>();
             var move = fullMoves.First(n => n.possiton == pos);
             nextMoves = fullMoves.Where(n => n.PrevPossiton.Select(m=>m.Position).Contains(pos)).ToList();
-            if (counter == 1) return shareForOne(nextMoves, move);
+            if (counter == 1) return findConnection(move,shareForOne(nextMoves));
             if(counter > 1)
             {
                 foreach (var item in nextMoves.Select(n => n.possiton))
                 {
                     nextNextMoves.Add(fullMoves.Where(n => n.PrevPossiton.Select(m => m.Position).Contains(item)).ToList());
                 }
+                if(counter == 2) return findConnection(move,shareForTwo(nextNextMoves,nextMoves, move));
             }
             if(counter > 2)
             {
@@ -141,20 +156,53 @@ namespace Api
                     helpedList.Clear();
                 }
             }
-
             return res;
+        }
+        private MovingXml shareForTwo(List<List<MovingXml>> nextNextMoves,List<MovingXml> nextMoves, MovingXml move)
+        {
+            Dictionary<string, MovingXml> routsMove = new Dictionary<string, MovingXml>();
+            List<MovingXml> bestsMoves = new List<MovingXml>();
+            foreach (var item in nextNextMoves)
+            {
+                var choes = shareForOne(item);
+                
+                bestsMoves.Add(choes);
+            }
+            var best = shareForOne(bestsMoves);
 
         }
-
-        private string shareForOne(List<MovingXml> nextMoves, MovingXml move)
+        private MovingXml shareForOne(List<MovingXml> nextMoves)
         {
-            var options = move.Chanse;
+            MovingXml best = nextMoves[0];
             foreach (var item in nextMoves)
             {
-                nextMoves
+                if (best == item) continue;
+                else best = whoIsTheBest(item, best);
             }
+            return best;
         }
 
+        private MovingXml whoIsTheBest(MovingXml item, MovingXml best)
+        {
+            return figureCounting(item.possiton) > figureCounting(best.possiton) ? item : best;
+        }
+        private int figureCounting(string possition)
+        {
+            int value = 0;
+            possition = possition.Split(' ')[0];
+            foreach (var item in possition)
+            {
+                if(figuresValue.Select(n=>n.Key).Contains(item))
+                {
+                    value += figuresValue[item];
+                }
+            }
+            return value;
+        }
+        private string findConnection(MovingXml one, MovingXml two)
+        {
+            return two.PrevPossiton.FirstOrDefault(n => n.Position == one.possiton).Move;
+        }
         /// <summary>
         /// 
         /// </summary>
