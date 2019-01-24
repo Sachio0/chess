@@ -12,5 +12,17 @@ namespace Api
     {
         [XmlElement]
         public MovingXml[] moves;
+
+        [XmlAttribute]
+        public int wins;
+
+        [XmlAttribute]
+        public int louse;
+
+        [XmlAttribute]
+        public int winsARow;
+
+        [XmlAttribute]
+        public int louseARow;
     }
 }
