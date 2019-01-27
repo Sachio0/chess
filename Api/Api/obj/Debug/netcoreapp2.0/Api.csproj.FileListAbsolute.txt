@@ -62,3 +62,14 @@ G:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfoInputs.cache
 G:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfo.cs
 G:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.dll
 G:\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.pdb
+C:\Users\dybek\Source\Repos\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.deps.json
+C:\Users\dybek\Source\Repos\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.runtimeconfig.json
+C:\Users\dybek\Source\Repos\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.runtimeconfig.dev.json
+C:\Users\dybek\Source\Repos\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.dll
+C:\Users\dybek\Source\Repos\chess\Api\Api\bin\Debug\netcoreapp2.0\Api.pdb
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.csprojAssemblyReference.cache
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.csproj.CoreCompileInputs.cache
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfoInputs.cache
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.AssemblyInfo.cs
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.dll
+C:\Users\dybek\Source\Repos\chess\Api\Api\obj\Debug\netcoreapp2.0\Api.pdb

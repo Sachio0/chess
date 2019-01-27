@@ -9,7 +9,7 @@ namespace Api.Extensions
     {
         public static string ProbablityRandom(this Dictionary<string,int> chance)
         {
-            Dictionary<string, int> addonObject = new Dictionary<string, int>();
+            List<string> addonObject = new List<string>();
             int options = chance.Count;
             int pointSum = chance.Sum(n => n.Value);
             Random random = new Random();
@@ -20,12 +20,10 @@ namespace Api.Extensions
                 if(item.Value > 1)
                     for (int i = 1; i < item.Value; i++)
                     {
-                        addonObject.Add(item.Key,item.Value);
+                        addonObject.Add(item.Key);
                     }
             }
-            chance.AddRange(addonObject);
-            var arrayOfOptions = chance.Select(n => n.Key).ToArray();
-            return arrayOfOptions[random.Next(arrayOfOptions.Length)];
+            return addonObject[random.Next(addonObject.Count)];
             
         }
         public static bool AllTheSame<T>(this ICollection<T> collection)

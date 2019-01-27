@@ -22,7 +22,7 @@
 </label>
 <label class="buttonDown">
     Ucz się
-    <input type="checkbox" id="lern" checked="checked" />
+    <input type="checkbox" id="lern" />
 </label>
 <input type="button" id="toFileIA" value="Pobierz IA" Class="buttonDown" />
 @*<form asp-controller="Home" asp-action="UploadFile" method="post" class="buttonDown"
@@ -94,27 +94,40 @@
     var makePCMove = function () {
         updateStatus();
         var possibleMoves = game.moves();
-        if ($('#lern').prop("checked")) {
-            if (possibleMoves.length === 0 || !$('#IA').prop("checked")) return;
-        }
-        else if(possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
+        //if ($('#lern').prop("checked")) {
+        //    if (possibleMoves.length === 0 || !$('#IA').prop("checked")) return;
+        //}
+        //else 
+        if (possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
         return;
         var board2 = {
             Turn: game.turn(),
             Possiotion: game.fen(),
-            Status: false,
+            //Status: false,
             possibleMoves: game.moves()
         };
-        fetch('/home/Ia', {
-            method: 'POST',
-            body: JSON.stringify(board2),
-            headers: {
-                'Content-Type': 'application/json'
+        //fetch('/home/Ia', {
+        //    method: 'POST',
+        //    body: JSON.stringify(board2),
+        //    headers: {
+        //        'Content-Type': 'application/json'
+        //    }
+        //}).then(res => res.json())
+        //    .then(response => makemovefrom(JSON.stringify(response)))
+        //    .catch(error => console.error('Error:', error));
+        $.ajax({
+            type: 'POST',
+            url: '/home/Ia',
+            dataType: 'json',
+            async: false,
+            contentType: 'application/json',
+            data: JSON.stringify(board2),
+            success: function (result) {
+                makemovefrom(result);
+                console.log('Data received: ');
+                console.log(result);
             }
-        }).then(res => res.json())
-            .then(response => makemovefrom(JSON.stringify(response)))
-            .catch(error => console.error('Error:', error));
-
+        });
     }
     function makemovefrom(pos) {
         game.move(pos.split('"').join(""));

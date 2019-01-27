@@ -81,7 +81,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Ia([FromBody] Board board)
+        public IActionResult Ia([FromBody]Board board)
         {
             Choser choser;
             if (board.turn == 'w') choser = new Choser(Response.HttpContext, "Game2.xml", board.turn);
