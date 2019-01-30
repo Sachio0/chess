@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "title";
     Layout = "_Layout";
 }
@@ -24,23 +23,21 @@
     Ucz się
     <input type="checkbox" id="lern" />
 </label>
+
 <input type="button" id="toFileIA" value="Pobierz IA" Class="buttonDown" />
-@*<form asp-controller="Home" asp-action="UploadFile" method="post" class="buttonDown"
-      enctype="multipart/form-data">
-    <input type="file" name="file" />
-    <button type="submit">Upload File</button>
-</form>*@
 <br />
 <label Class="buttonDown">
-    Wczytaj ustawienie na planszy
-    <input type="file" id="fromFile" accept=".txt" value="Wczytaj"  />
+    <form asp-controller="Home" asp-action="UploadFile" method="post" class="buttonDown" enctype="multipart/form-data" Class="buttonDown">
+        <input type="file" name="file" />
+        <button type="submit">Wyślij IA</button>
+    </form>
 </label>
 <label Class="buttonDown">
-    Wczytaj Bota
-    <input type="file" id="IAFile" accept=".xml" value="Wczytaj"  />
+    <input type="file" id="IAFile" accept=".xml" value="Wczytaj" />
+    <input type="submit" value="OK" />
 </label>
 <script>
-
+    var end = false;
     var board,
         game = new Chess(),
         statusEl = $('#status'),
@@ -48,7 +45,6 @@
         pgnEl = $('#pgn');
     var onDragStart = function ( piece) {
         if (game.game_over() === true ||
-            (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
             (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
             return false;
         }
@@ -73,8 +69,17 @@
         download("chess.txt", fen[0]);
         console.log(fen[0]);
     }
-    function dowloadIA() {
+    function TdownloadIA(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/xml;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
 
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     }
     function download(filename, text) {
         var element = document.createElement('a');
@@ -89,6 +94,10 @@
         document.body.removeChild(element);
     }
     var makeInter = function () {
+        @if(ViewData["Upload"] != null)
+        {
+            @:alert("@ViewData["Upload"]");
+        }
         if ($('#IA').prop("checked")) window.setInterval(makePCMove, 200);
     }
     var makePCMove = function () {
@@ -97,24 +106,14 @@
         //if ($('#lern').prop("checked")) {
         //    if (possibleMoves.length === 0 || !$('#IA').prop("checked")) return;
         //}
-        //else 
+        //else
         if (possibleMoves.length === 0 || game.turn() === 'w' || !$('#IA').prop("checked"))
         return;
         var board2 = {
             Turn: game.turn(),
             Possiotion: game.fen(),
-            //Status: false,
             possibleMoves: game.moves()
         };
-        //fetch('/home/Ia', {
-        //    method: 'POST',
-        //    body: JSON.stringify(board2),
-        //    headers: {
-        //        'Content-Type': 'application/json'
-        //    }
-        //}).then(res => res.json())
-        //    .then(response => makemovefrom(JSON.stringify(response)))
-        //    .catch(error => console.error('Error:', error));
         $.ajax({
             type: 'POST',
             url: '/home/Ia',
@@ -124,8 +123,6 @@
             data: JSON.stringify(board2),
             success: function (result) {
                 makemovefrom(result);
-                console.log('Data received: ');
-                console.log(result);
             }
         });
     }
@@ -145,16 +142,21 @@
         board.position(game.fen());
     };
     function downloadIA() {
-        let url = `/home/DownloadIA`;
-        return fetch(url, {
-            method: 'GET',
-        }).then(function (resp) {
-            return resp.blob
-        }).then(function (blob) {
-            download(blob);
-        });
+        $.ajax(
+            {
+                type: "GET",
+                url: "/home/Download",
+                data: "Game1.xml",
+                success: function (result) {
+                    TdownloadIA("Game1.xml", new XMLSerializer().serializeToString(result.documentElement));
+                },
+                error: function (req, status, error) {
+                    alert("Sorry! We could not receive your feedback at this time.");
+                }
+            });
     }
-    
+
+
 
     var onDrop = function (source, target) {
 
@@ -174,7 +176,9 @@
     };
 
     var updateStatus = function () {
+        if (end) return;
         var status = '';
+
 
         var moveColor = 'White';
         if (game.turn() === 'b') {
@@ -182,15 +186,17 @@
         }
 
         if (game.in_checkmate() === true) {
-            status = 'Game over, ' + moveColor + ' is in checkmate.';
+            status = 'Przegrał ' + moveColor;
             if ($('#lern').prop("checked")) location.reload();
             alert(status);
+            end = true;
         }
 
         else if (game.in_draw() === true) {
-            status = 'Game over, drawn position';
+            status = 'Remis';
             if ($('#lern').prop("checked")) location.reload();
             alert(status);
+            end = true;
         }
 
         else {
@@ -225,10 +231,19 @@
     updateStatus();
     $(window).resize(board.resize);
     $('#startBtn').on('click',
-        function() {
-
+        function () {
+            end = false;
             game.load("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR" + " w - - 1 45");
             board.start();
+            $.ajax({
+                type: 'POST',
+                url: '/home/Reset',
+                dataType: 'json',
+                data: "",
+                success: function (result) {
+                    Console.log(result);
+                }
+            });
         });
     $('#fromFile').on('change', clickSetPositionBtn);
     $('#toFile').on('click', clickGetPositionBtn);

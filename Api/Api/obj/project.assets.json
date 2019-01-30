@@ -13530,23 +13530,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dybek\\.nuget\\packages\\": {},
+    "C:\\Users\\PC\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dybek\\Source\\Repos\\chess\\Api\\Api\\Api.csproj",
+      "projectUniqueName": "F:\\chess\\Api\\Api\\Api.csproj",
       "projectName": "Api",
-      "projectPath": "C:\\Users\\dybek\\Source\\Repos\\chess\\Api\\Api\\Api.csproj",
-      "packagesPath": "C:\\Users\\dybek\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dybek\\Source\\Repos\\chess\\Api\\Api\\obj\\",
+      "projectPath": "F:\\chess\\Api\\Api\\Api.csproj",
+      "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+      "outputPath": "F:\\chess\\Api\\Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\dybek\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

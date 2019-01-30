@@ -11,7 +11,6 @@ namespace Api
 {
     public class Choser //: IChoser
     {
-        private string choseIndexs;
         private string _fileName;
         private ISession session;
         private Dictionary<char, int?> figuresCount = new Dictionary<char, int?>()
@@ -51,7 +50,7 @@ namespace Api
 
         public Choser(HttpContext context, string fileName, char turn)
         {
-             this.session = context.Session;
+            this.session = context.Session;
             updateSession();
             _fileName = fileName;
             fillFullMoves();
@@ -65,7 +64,7 @@ namespace Api
             louseARow = file.Tree.louseARow;
         }
 
-        
+
         //private List<string> lasts = new List<string>();
         //Description
         //P - pionek
@@ -80,11 +79,11 @@ namespace Api
 
         public string makeRandomeMove(Board tree)
         {
-            
-            string res = String.Empty;
-            turn = tree.turn == 'b';
+
+            string res = String.Empty ;
+            //turn = tree.turn == 'b';
             chengeCountFigures(tree.Possiotion);
-            if (!String.IsNullOrEmpty(last) && last != tree.Possiotion)
+            if (!String.IsNullOrEmpty(last))
             {
                 var figure = checkFigureCount(last);
                 if (figure != ' ')
@@ -96,7 +95,7 @@ namespace Api
             {
                 res = useChanse(tree.Possiotion);
             }
-            if(string.IsNullOrEmpty(res))
+            else if(String.IsNullOrEmpty(res))
             {
                 Random r = new Random();
                 addToFile(tree);
@@ -114,14 +113,14 @@ namespace Api
             int value = 0;
             string res = String.Empty;
             List<MovingXml> nextMoves;
-            Dictionary<PrevChoes,List<MovingXml>> nextNextMoves = new Dictionary<PrevChoes, List<MovingXml>>();
+
+            Dictionary<PrevChoes, List<MovingXml>> nextNextMoves = new Dictionary<PrevChoes, List<MovingXml>>();
             Dictionary<PrevChoes, List<List<MovingXml>>> nextNextNextMoves = new Dictionary<PrevChoes, List<List<MovingXml>>>();
             var move = fullMoves.First(n => n.possiton == pos);
-            nextMoves = fullMoves.Where(n => n.PrevPossiton.Select(m=>m.Position).Contains(pos)).ToList();
-            if (nextMoves.Count() < 1) return res;
-            if (counter == 1)
+            nextMoves = fullMoves.Where(n => n.PrevPossiton.Select(m => m.Position).Contains(pos)).ToList();
+            if (nextMoves.Count == 0)
             {
-                if(findConnection(move, shareForOne(nextMoves, out value),out string newMove)) res = newMove;
+                return move.Chanse.ProbablityRandom();
             }
             if (counter > 1)
             {
@@ -129,13 +128,13 @@ namespace Api
                 {
                     var list = fullMoves.Where(n => n.PrevPossiton.Select(m => m.Position).Contains(item.possiton)).ToList();
                     var moveToList = item.PrevPossiton.FirstOrDefault(n => n.Position == pos);
-                    nextNextMoves.Add(moveToList,list);
+                    nextNextMoves.Add(moveToList, list);
                 }
-                if(nextNextMoves.Count < 1)
-                {
-                    if (findConnection(move, shareForOne(nextMoves, out value), out string newMove)) res = newMove;
-                }
-                if(counter == 2) res =  shareForTwo(nextNextMoves, out value);
+                if (nextNextMoves.Count > 0) res = shareForTwo(nextNextMoves, out value);
+            }
+            else if (counter == 1 || nextNextMoves.Count == 0)
+            {
+                if (findConnection(move, shareForOne(nextMoves, out value), out string newMove)) res = newMove;
             }
             if (counter > 2)
             {
@@ -146,40 +145,35 @@ namespace Api
                     {
                         helpedList.Add(fullMoves.Where(n => n.PrevPossiton.Select(m => m.Position).Contains(ob)).ToList());
                     }
-                    nextNextNextMoves.Add(item.Key,helpedList);
+                    nextNextNextMoves.Add(item.Key, helpedList);
                     helpedList.Clear();
                 }
-                if(nextNextNextMoves.Count < 0)
+                if (nextNextNextMoves.Count > 0)
                 {
-                    res = shareForTwo(nextNextMoves, out value);
+                    try
+                    {
+                        res = shareForThree(nextNextNextMoves, out value);
+                    }catch
+                    {
+
+                    }
+                    
                 }
-                res = shareForThree(nextNextNextMoves, out value);
+                    
             }
-            return UpdateAfterUse(move, res, value);
+            if (String.IsNullOrEmpty(res)) res = move.Chanse.ProbablityRandom();
+            return upDateChanseAfterUse(res,move, value);
         }
-
-        private string UpdateAfterUse(MovingXml currentObject, string res, int value)
-        {
-            var index = fullMoves.IndexOf(fullMoves.FirstOrDefault(n => n == currentObject));
-            var dictCurrentObj = currentObject.Chanse;
-            if(value == 0) return dictCurrentObj.ProbablityRandom();
-            dictCurrentObj[res] = currentObject.Chanse[res] + value;
-            currentObject.Chanse = dictCurrentObj;
-            fullMoves[index] = currentObject;
-            FileContorl file = new FileContorl(_fileName);
-            file.update(fullMoves);
-            return dictCurrentObj.ProbablityRandom();
-        }
-
         private string shareForThree(Dictionary<PrevChoes, List<List<MovingXml>>> nextNextNextMoves, out int value)
         {
             value = 0;
             Dictionary<PrevChoes, List<MovingXml>> nextNextMove = new Dictionary<PrevChoes, List<MovingXml>>();
-            Dictionary<string, MovingXml> dyc = new Dictionary<string, MovingXml>(); 
+            Dictionary<string, MovingXml> dyc = new Dictionary<string, MovingXml>();
             foreach (var NextNextMoves in nextNextNextMoves)
             {
                 foreach (var item in NextNextMoves.Value)
                 {
+                    if (item.Count == 0) continue;
                     nextNextMove.Add(NextNextMoves.Key, item);
                 }
                 var res = forTwo(nextNextMove, out value);
@@ -189,24 +183,25 @@ namespace Api
             var best = dyc.FirstOrDefault();
             foreach (var item in dyc)
             {
-                if (best.Value == whoIsTheBest(item.Value, best.Value,out value)) continue;
+                if (best.Value == whoIsTheBest(item.Value, best.Value, out value)) continue;
                 else best = item;
             }
             return best.Key;
         }
         private string shareForTwo(Dictionary<PrevChoes, List<MovingXml>> nextNextMoves, out int value)
         {
-            return forTwo(nextNextMoves, out value).Key;
+            return forTwo(nextNextMoves,out value).Key;
         }
-        KeyValuePair<string,MovingXml> forTwo(Dictionary<PrevChoes, List<MovingXml>> nextNextMoves, out int value)
+        KeyValuePair<string, MovingXml> forTwo(Dictionary<PrevChoes, List<MovingXml>> nextNextMoves , out int value)
         {
             value = 0;
             Dictionary<string, MovingXml> routsMove = new Dictionary<string, MovingXml>();
             List<MovingXml> bestsMoves = new List<MovingXml>();
             foreach (var item in nextNextMoves)
             {
-                var choes = shareForOne(item.Value, out value);
-                routsMove.Add(item.Key.Move, choes);
+                if (item.Value.Count == 0) continue;
+                var choes = shareForOne(item.Value,out value);
+                if(!routsMove.Keys.Contains(item.Key.Move))routsMove.Add(item.Key.Move, choes);
 
             }
             var best = routsMove.FirstOrDefault();
@@ -215,10 +210,11 @@ namespace Api
                 if (best.Value == whoIsTheBest(item.Value, best.Value,out value)) continue;
                 else best = item;
             }
+
             return best;
         }
 
-        private MovingXml shareForOne(List<MovingXml> nextMoves,out int value)
+        private MovingXml shareForOne(List<MovingXml> nextMoves, out int value)
         {
             value = 0;
             MovingXml best = nextMoves[0];
@@ -231,14 +227,12 @@ namespace Api
         }
         private MovingXml whoIsTheBest(MovingXml item, MovingXml best, out int value)
         {
-            value = figureCounting(item.possiton);
-            var value2 = figureCounting(best.possiton);
-            if(value2 > value)
-            {
-                value = value2;
-                return best;
-            }
-            return item;
+            var valueItem = figureCounting(item.possiton);
+            var valueBest = figureCounting(best.possiton);
+            if (valueBest > valueItem) value = valueBest - valueItem;
+            if (valueBest < valueItem) value = valueItem - valueBest;
+            else value = 0;
+            return valueItem > valueBest ? item : best;
         }
         private int figureCounting(string possition)
         {
@@ -246,14 +240,14 @@ namespace Api
             possition = possition.Split(' ')[0];
             foreach (var item in possition)
             {
-                if(figuresValue.Select(n=>n.Key).Contains(item))
+                if (figuresValue.Select(n => n.Key).Contains(item))
                 {
                     value += figuresValue[item];
                 }
             }
             return value;
         }
-        
+
         private bool findConnection(MovingXml one, MovingXml two, out string move)
         {
             move = two.PrevPossiton.FirstOrDefault(n => n.Position == one.possiton).Move;
@@ -294,37 +288,10 @@ namespace Api
             figuresCount['Q'] = positon.Count(n => n == 'Q');
         }
 
-
-        //TO Change
-        private void upDateChanse(char figure)
-        {
-            
-            var index = fullMoves.IndexOf(fullMoves.FirstOrDefault(n => n.possiton == last));
-            var currentObject = fullMoves.FirstOrDefault(n => n.possiton == last);
-            var dictCurrentObj = currentObject.Chanse;
-            dictCurrentObj[lastChoese] = currentObject.Chanse[lastChoese] + figuresValue[figure];
-            currentObject.Chanse = dictCurrentObj;
-            fullMoves[index] = currentObject;
-            FileContorl file = new FileContorl(_fileName);
-            file.update(fullMoves);
-        }
-
-        private int[] getChoseIndexs()
-        {
-            var inedxs = choseIndexs.Split(';');
-            int[] res = new int[inedxs.Length];
-            for (int i = 0; i < inedxs.Length; i++)
-            {
-                res[i] = Convert.ToInt32(inedxs[i]);
-            }
-            return res;
-        }
-        #region alt
         private void upDateXml(char Figure, Board tree)
         {
             var index = fullMoves.IndexOf(fullMoves.FirstOrDefault(n => n.possiton == last));
             var PrevObject = fullMoves[index];
-            PrevObject.NextPossiton.Add(tree.Possiotion);
             PrevObject.Chanse = UpdateChanse(PrevObject.Chanse, Figure);
             fullMoves[index] = PrevObject;
             FileContorl file = new FileContorl(_fileName);
@@ -336,12 +303,38 @@ namespace Api
             chanse[lastChoese] += figuresValue[figure];
             return chanse;
         }
-
-        private void addMove(char Figure)
+        private string upDateChanseAfterUse(string MoveUp, MovingXml currentObject, int value)
         {
-
+            var index = fullMoves.IndexOf(currentObject);
+            var dictCurrentObj = currentObject.Chanse;
+            if(last!= null)
+            {
+                var indexprev = fullMoves.IndexOf(fullMoves.FirstOrDefault(n => n.possiton == last));
+                var PrevObject = fullMoves[indexprev];
+                if (!currentObject.PrevPossiton.Select(n => n.Position).Contains(last))
+                {
+                    currentObject.PrevPossiton.Add(new PrevChoes { Position = last, Move = lastChoese });
+                }
+            }
+            dictCurrentObj[MoveUp] = currentObject.Chanse[MoveUp] + value;
+            currentObject.Chanse = dictCurrentObj;
+            
+            fullMoves[index] = currentObject;
+            FileContorl file = new FileContorl(_fileName);
+            file.update(fullMoves);
+            return dictCurrentObj.ProbablityRandom();
         }
-        #endregion
+        //private int[] getChoseIndexs()
+        //{
+        //    var inedxs = choseIndexs.Split(';');
+        //    int[] res = new int[inedxs.Length];
+        //    for (int i = 0; i < inedxs.Length; i++)
+        //    {
+        //        res[i] = Convert.ToInt32(inedxs[i]);
+        //    }
+        //    return res;
+        //}
+
         private void reaFile()
         {
             FileContorl file = new FileContorl(_fileName);
@@ -396,7 +389,7 @@ namespace Api
 
             last = SessionExtensions.GetString(session, "last");
             lastChoese = SessionExtensions.GetString(session, "lastChose");
-            choseIndexs = SessionExtensions.GetString(session, "choseIndexs");
+            //choseIndexs = SessionExtensions.GetString(session, "choseIndexs");
             if (!String.IsNullOrEmpty(last))
                 foreach (var item in figuresCount.Select(n => n.Key).ToArray())
                 {

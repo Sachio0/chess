@@ -55,7 +55,8 @@ namespace Api.Controllers
             ViewData["pos"] = HttpContext.Request.Cookies["pos"];
             return View();
         }
-
+        
+        
         public IActionResult Edit()
         {
             return View();
@@ -67,6 +68,12 @@ namespace Api.Controllers
 
 
             return View("Game");
+        }
+        [HttpPost]
+        public IActionResult Reset()
+        {
+            HttpContext.Session.Clear();
+            return Json("sucesfull");
         }
         public void Set(string key, string value, int? expireTime)
         {
@@ -88,14 +95,40 @@ namespace Api.Controllers
             else choser = new Choser(Response.HttpContext, "Game1.xml", board.turn);
             return Json(choser.makeRandomeMove(board));
         }
-        public async Task<IActionResult> DownloadIA()
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            var memory = new MemoryStream();
-            using (var stream = new FileStream("game.xml", FileMode.Open))
+
+            if (file == null || file.Length == 0)
             {
-                await stream.CopyToAsync(memory);
+                ViewData["Upload"] = "fail";
+                return View("Game", "Fail");
             }
-            return File(memory, Path.GetFileName(@"F:\chess\Api\Api\Game.xml"));
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "Game1.xml");
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            ViewData["Upload"] = "wysłane";
+            return View("Game", "wysłane");
+        }
+        //public FileResult Download(string id)
+        //{
+        //    string filename = @"F:\chess\Api\Api\Game1.xml";
+        //    string contentType = "application/xml";
+        //    //Parameters to file are
+        //    //1. The File Path on the File Server
+        //    //2. The content type MIME type
+        //    //3. The parameter for the file save by the browser
+        //    return File(filename, contentType, "Game1.xml");
+        //}
+        [HttpGet]
+        public FileStreamResult Download()
+        {
+            return new FileStreamResult(new FileStream(Path.Combine(Directory.GetCurrentDirectory(),"Game1.xml" ), FileMode.Open), "text/xml");
         }
         //public async Task<IActionResult> Download(string filename)
         //{
@@ -131,5 +164,28 @@ namespace Api.Controllers
 
         //    return RedirectToAction("Files");
         //}
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet"},  
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
+        }
     }
 }
